@@ -1,0 +1,24 @@
+{
+  "title": "示例聊天归档",
+  "workspace": "demo",
+  "messages": [
+    {
+      "id": "m-001",
+      "authorId": "alice",
+      "createdAt": "2026-09-18T09:12:00Z",
+      "body": "归档看起来正常吗？"
+    },
+    {
+      "id": "m-002",
+      "authorId": "bob",
+      "createdAt": "2026-09-18T09:13:30Z",
+      "body": "正常。注意这条带格式字符：**加粗**、`代码`、[链接](https://example.invalid)。"
+    },
+    {
+      "id": "m-003",
+      "authorId": "alice",
+      "createdAt": "2026-09-18T09:15:02Z",
+      "body": "收到，转换后这些字符应该被转义，不能当格式指令执行。"
+    }
+  ]
+}

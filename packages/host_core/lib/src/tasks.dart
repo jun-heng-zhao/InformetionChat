@@ -35,7 +35,7 @@ class LocalTask {
   final String callId;                       // 传给提供者的 callId，用于取消与日志关联
   final int depth;                           // 该调用在调用链中的深度，用于环检测
   final DateTime createdAt;                  // 创建时间
-  final DateTime expiresAt;                  // 结果保留截止时间
+  DateTime expiresAt;                        // 结果保留截止时间
 
   String state;                              // 见 TaskState
   double progress;                           // 0.0 ~ 1.0

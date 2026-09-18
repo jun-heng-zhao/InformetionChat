@@ -7,5 +7,4 @@ environment:
 
 workspace:
   - packages/host_core                 # 纯 Dart 宿主核心：加载器/权限/注册表/句柄/任务/通知
-  - apps/host_shell                    # Flutter 宿主外壳：工作台界面与 WebView 运行时
-  - tools/agent-cli                    # Agent 测试客户端：stdio JSON-RPC 适配器
+  - tools/demo_runner                  # M1 端到端演示器：装配宿主、加载插件、走通验收主线

@@ -1,20 +1,33 @@
 # dev.format-converter
 
-本地格式转换早期 UI 原型，目标是将聊天归档转换为 Markdown、CSV 或 HTML。插件按需安装，与应用是否由同一维护者开发无关。
+本地格式转换插件，把聊天归档转换为 Markdown，并提供可复用服务 `document.convert@1.0.0` 供其他插件与 Agent 调用。
 
-当前只有页面与 manifest，没有已实现的原生宿主、正式 Bridge 或可运行 CLI。页面中的简化消息桥、导出读取和转换逻辑需要按新的本地契约重写后验收，不能作为安全隔离已实现的证据。
+## 当前状态
 
-清单已迁移到 v1.2：纯 UI、本地离线、无强制签名；四个平台声明为适配目标，尚未通过实机验证。UI Bridge 1.2 为目标接口版本，不代表旧页面已完成握手。
+已从未发布的原型迁移到 manifest 1.2，并可作为真实服务被调用：
 
-本地开发目标流程：加载目录 → 校验清单 → 授权一份输入 → 在沙箱转换 → 保存输出 → 停用并验证旧句柄失效。无需发布账号、证书或审核服务。
+| 文件 | 说明 |
+|---|---|
+| `manifest.json` | manifest 1.2；权限逐项声明；声明 `document.convert`，`agentCallable: true`、`requiresUI: false` |
+| `schemas/*.json` | 服务参数与结果 schema，加载器校验其存在且不出包 |
+| `service/index.js` | 服务实现；演示阶段由宿主的子进程运行时承载 |
+| `ui/index.html`、`ui/assets/*` | 页面逻辑；内联脚本已外置以符合自带 CSP |
 
-按 M1 目标需将转换操作独立成可复用服务，声明参数/结果 schema 后供其他插件与 Agent 调用。现有页面没有声明已实现服务，避免把纯 UI 原型误当成可自动化工具。
+验证方式见[开发环境与运行说明](../../docs/开发环境与运行说明.md)：演示器会通过 `host.service.call` 调用本插件，并由 Agent 会话调用同一实现。
 
-文档审查确认的迁移项：
+## 迁移完成情况
 
-- 页面读取 `records` / `author`，标准归档使用 `messages` / `authorId`，需统一字段并补齐归档校验。
-- manifest 的 `storage.plugin.read/write` 是旧缩写，正式清单应拆为两个权限；schema 只验证字符串形状，不能代替权限语义校验。
-- 页面使用通配目标 postMessage、缺少可信握手；内联脚本与清单的 `script-src 'self'` 冲突。需迁移到宿主绑定的通道和包内脚本，不能通过放宽 CSP 解决。
-- `host.file.save` 需传资源句柄，服务需有参数/结果 schema、激活和取消入口；原型的转换与 HTML/CSV 输出还需单独检查转义和公式注入。
+原型的下列问题已处理：
 
-本次只修订设计文档，保留原型代码和清单供追溯；上列问题未被当作已实现修复。
+- `records` / `author` 改为标准归档的 `messages` / `authorId`，并在转换前校验归档结构。
+- manifest 的 `storage.plugin.read/write` 缩写已拆为两个独立权限。
+- 通配 `postMessage` 改为宿主注入的受信通道；页面不再向任意窗口广播。
+- 内联脚本与样式已移到 `ui/assets/`，`script-src 'self'` 不再冲突；`host.file.save` 改为提交结果句柄。
+- 转换逻辑独立成服务，按钮与 Agent 调用同一份实现。
+
+## 尚未处理
+
+- 正在运行的是子进程替身运行时，**不是** WebView 沙箱；CSP 实际拦截与导航阻断未验证。
+- 只实现 Markdown 目标格式；原型的 CSV / HTML 输出未迁移。
+- 输出转义只覆盖 Markdown 结构字符，CSV 公式注入等场景随对应格式迁移时单独处理。
+- 未做包快照与数据迁移，升级回滚能力尚未实现。

@@ -21,6 +21,16 @@ class ErrorCode {
   static const notFound = 'NOT_FOUND';                                   // 对象不存在或不在当前会话可见范围
 }
 
+/// 未知 JSON-RPC 方法：由传输层转成标准 -32601，与业务错误区分开
+class MethodNotFoundException implements Exception {
+  final String method;                   // 未实现或不存在的方法名
+
+  const MethodNotFoundException(this.method);
+
+  @override
+  String toString() => 'MethodNotFoundException($method)';
+}
+
 /// 宿主业务异常：携带业务码、可读消息与可选明细，由分发层转成 JSON-RPC 错误
 class HostException implements Exception {
   final String code;                     // 业务错误码，见 ErrorCode

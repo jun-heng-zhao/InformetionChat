@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>格式转换</title>
+  <title>归档查看器</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <h1>聊天记录格式转换</h1>
-  <p>本页面只提供界面；实际转换由本插件提供的 <code>document.convert</code> 服务完成，
-     因此其他插件和 Agent 调用的是同一份实现。</p>
+  <h1>聊天归档查看器</h1>
+  <p>本插件不实现格式转换，而是消费 <code>document.convert</code> 服务；
+     用户绑定的提供者决定实际由哪个插件完成转换。</p>
 
-  <label for="format">目标格式</label>
+  <label for="format">导出格式</label>
   <select id="format">
     <option value="markdown">Markdown</option>
   </select>
 
-  <button id="pick">选择归档并转换</button>
+  <button id="pick">选择归档并导出</button>
   <button id="save" disabled>保存结果</button>
 
   <label for="preview">预览</label>
@@ -27,4 +27,3 @@
   <script src="assets/page.js"></script>
 </body>
 </html>
-

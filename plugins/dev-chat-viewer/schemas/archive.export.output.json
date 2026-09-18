@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:informetionchat:service:archive.export:output:1.0.0",
+  "title": "archive.export 输出",
+  "type": "object",
+  "required": ["result", "mediaType"],
+  "additionalProperties": false,
+  "properties": {
+    "result": {
+      "type": "string",
+      "description": "导出结果正文；宿主会把它保存成临时资源句柄"
+    },
+    "mediaType": {
+      "type": "string",
+      "description": "结果 MIME 类型"
+    },
+    "messageCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "由转换服务回传的消息条数"
+    },
+    "convertedBy": {
+      "type": "string",
+      "description": "实际完成转换的提供者安装 ID，便于确认绑定未被悄悄更换"
+    }
+  }
+}

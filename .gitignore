@@ -1,0 +1,15 @@
+# Dart / Flutter 构建产物
+.dart_tool/
+.packages
+build/
+
+# 宿主暂存区与运行期数据不应进入版本库
+.host-staging/
+.host-data/
+
+# 编辑器与系统文件
+.idea/
+.vscode/*
+!.vscode/settings.json
+*.iml
+.DS_Store

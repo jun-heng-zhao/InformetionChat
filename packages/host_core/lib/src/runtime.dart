@@ -136,6 +136,9 @@ class SubprocessPluginRuntime implements PluginRuntime {
     RpcError? error;
     try {
       result = await onHostCall(config.installationId, request.method, request.params);
+    } on MethodNotFoundException catch (e) {
+      // 未知方法走 JSON-RPC 标准错误码，便于调用方与业务错误区分
+      error = RpcError(RpcErrorCode.methodNotFound, '未知方法：${e.method}');
     } on HostException catch (e) {
       error = RpcError(RpcErrorCode.businessError, e.message, data: {'code': e.code, if (e.detail != null) 'detail': e.detail});
     } catch (e) {

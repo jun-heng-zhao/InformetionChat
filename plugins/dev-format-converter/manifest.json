@@ -1,8 +1,9 @@
 {
+  "manifestVersion": "1.2",
   "id": "dev.format-converter",
-  "version": "0.1.0-dev.1",
+  "version": "1.0.0",
   "displayName": "开发格式转换",
-  "description": "将宿主聊天导出转换为 Markdown、CSV 或 HTML。",
+  "description": "把宿主聊天归档转换为 Markdown，并以可复用服务 document.convert 供其他插件与 Agent 调用。",
   "publisher": "local.development",
   "license": "MIT",
   "apiVersion": "platform.v1",
@@ -10,51 +11,37 @@
     "platform": ">=1.0.0 <2.0.0",
     "uiBridge": "1.2"
   },
-  "platforms": [
-    "windows",
-    "linux",
-    "ios",
-    "android"
-  ],
-  "connectivity": "offline",
   "runtime": {
     "ui": {
       "entry": "ui/index.html",
       "format": "sandbox-webview",
-      "csp": "default-src 'self'; script-src 'self'; connect-src 'none'"
+      "csp": "default-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'"
     }
   },
-  "activationEvents": [
-    "onCommand:format-converter.open",
-    "onCommand:format-converter.convert"
-  ],
+  "platforms": ["linux", "windows"],
+  "connectivity": "offline",
+  "activationEvents": ["onService:document.convert"],
   "contributes": {
-    "commands": [
-      "format-converter.open",
-      "format-converter.convert"
-    ],
-    "views": [
-      "format-converter.panel"
-    ],
-    "menus": [
-      "message.actions.export-format"
-    ],
-    "settings": [
-      "format-converter.default-format"
+    "commands": ["format-converter.convert", "format-converter.open"],
+    "views": ["format-converter.panel"]
+  },
+  "permissions": ["storage.plugin.read", "storage.plugin.write", "file.pick", "file.read", "file.save", "service.call", "audit.append"],
+  "hostCapabilities": {
+    "required": ["ui.webview"],
+    "optional": []
+  },
+  "services": {
+    "provides": [
+      {
+        "id": "document.convert",
+        "version": "1.0.0",
+        "inputSchema": "schemas/document.convert.input.json",
+        "outputSchema": "schemas/document.convert.output.json",
+        "effects": ["read"],
+        "agentCallable": true,
+        "requiresUI": false
+      }
     ]
   },
-  "permissions": [
-    "chat.export",
-    "storage.plugin.read/write",
-    "file.save",
-    "audit.append"
-  ],
-  "dependencies": [],
-  "manifestVersion": "1.2",
-  "hostCapabilities": {
-    "required": [
-      "ui.webview"
-    ],
-    "optional": []
-  }
+  "dependencies": []
 }

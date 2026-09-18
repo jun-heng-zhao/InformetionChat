@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:informetionchat:service:document.convert:input:1.0.0",
+  "title": "document.convert 输入",
+  "type": "object",
+  "required": ["source", "targetFormat"],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "宿主签发的只读资源引用，形如 resource:<handle>；普通路径不构成授权",
+      "pattern": "^resource:h-[0-9]+-[0-9a-z]+$"
+    },
+    "targetFormat": {
+      "const": "markdown",
+      "description": "目标格式；本版只实现 markdown"
+    }
+  }
+}

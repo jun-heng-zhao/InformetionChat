@@ -51,7 +51,7 @@ class PackageLoader {
   /// 把 sourceDir 复制为宿主管理的只读快照并完成全部加载校验
   Future<StagedPackage> stage(Directory sourceDir) async {
     // 1. 源目录必须存在且不是链接，避免通过软链把包根指向包外
-    if (sourceDir is! Directory || !await sourceDir.exists()) {
+    if (!await sourceDir.exists()) {
       throw HostException(ErrorCode.notFound, '插件源目录不存在：${sourceDir.path}');
     }
     if (FileSystemEntity.isLinkSync(sourceDir.path)) {
@@ -119,6 +119,8 @@ class PackageLoader {
     final stagingDir = Directory(
       p.join(stagingRoot.path, '${manifest.id}-${manifest.version}-${_shortHash(manifest.id + manifest.version)}'),
     );
+    // 同名暂存目录可能是上次运行留下的只读快照，必须先清掉，否则写入会被拒
+    if (stagingDir.existsSync()) await stagingDir.delete(recursive: true);
     await stagingDir.create(recursive: true);
     final sortedPaths = entries.keys.toList()..sort();
     final stagedFiles = <StagedFile>[];

@@ -46,7 +46,7 @@ class HostNotification {
   final String eventId;                  // 来源事件 ID，配合修订号去重
   final String category;                 // 通知类别
   int revision;                          // 修订号，更高修订才能覆盖
-  final String requestedLevel;           // 插件请求的等级
+  String requestedLevel;                 // 插件请求的等级，更高修订可更新
   String effectiveLevel;                 // 宿主计算的展示等级
   String title;                          // 标题
   String body;                           // 正文
@@ -134,7 +134,7 @@ class NotificationEngine {
 
   final List<NotificationPolicy> _policies = []; // 用户授权策略
   final List<HostNotification> _notifications = []; // 全部通知记录
-  final List<DateTime> _criticalPopups = [];     // 近期紧急弹窗时间戳，用于限流
+  final Map<String, List<DateTime>> _criticalPopups = {}; // 来源 ID → 近期紧急弹窗时间戳，用于限流
   bool foreground = true;                        // 应用是否在前台，由宿主界面同步
   int _seq = 0;                                  // 通知序号
 
@@ -254,7 +254,7 @@ class NotificationEngine {
 
     // 5. 已过期或被撤回的事件不得复活：撤回记录保留到原有效期结束，防止重放
     if (existing != null && existing.state == NotifyState.withdrawn && !existing.isExpiredAt(at)) {
-      throw const HostException(ErrorCode.notFound, '事件已撤回且未过期，不允许重新发布：${req.eventId}');
+      throw HostException(ErrorCode.notFound, '事件已撤回且未过期，不允许重新发布：${req.eventId}');
     }
     if (req.expiresAt != null && !req.expiresAt!.isAfter(at)) {
       throw const HostException(ErrorCode.resourceExpired, '事件已过期，不能作为新提醒发布');
@@ -267,15 +267,16 @@ class NotificationEngine {
     var shouldPopup = false;
     if (effectiveLevel == NotifyLevel.critical) {
       if (!foreground) {
+        // 应用不在前台时不能弹窗，也不能把未展示的记录写成已展示
         reason = '应用不在前台，无法展示紧急弹窗（FOREGROUND_REQUIRED）';
-      } else if (!_consumeRateLimit(at)) {
-        state = NotifyState.received;
+      } else if (!_consumeRateLimit(req.sourceId, at)) {
         reason = '触发限流：每来源每分钟最多 $rateLimitPerMinute 条紧急提醒';
       } else {
         state = NotifyState.displayed;
         shouldPopup = true;
       }
-    } else if (effectiveLevel == NotifyLevel.important) {
+    } else {
+      // passive / normal / important 进入通知中心或横幅，前台即可展示
       state = foreground ? NotifyState.displayed : NotifyState.received;
     }
 
@@ -325,7 +326,6 @@ class NotificationEngine {
     required int revision,
     DateTime? now,
   }) {
-    final at = now ?? DateTime.now();
     final target = _notifications.where((n) => n.workspaceId == workspaceId &&
         n.installationId == installationId &&
         n.sourceId == sourceId &&
@@ -385,11 +385,12 @@ class NotificationEngine {
       .where((n) => n.workspaceId == workspaceId && n.installationId == installationId)
       .toList();
 
-  /// 限流检查：返回 false 表示本次不允许弹出
-  bool _consumeRateLimit(DateTime at) {
-    _criticalPopups.removeWhere((t) => at.difference(t) > const Duration(minutes: 1));
-    if (_criticalPopups.length >= rateLimitPerMinute) return false;
-    _criticalPopups.add(at);
+  /// 限流检查：按来源独立计数，返回 false 表示本次不允许弹出
+  bool _consumeRateLimit(String sourceId, DateTime at) {
+    final history = _criticalPopups.putIfAbsent(sourceId, () => []);
+    history.removeWhere((t) => at.difference(t) > const Duration(minutes: 1));
+    if (history.length >= rateLimitPerMinute) return false;
+    history.add(at);
     return true;
   }
 }

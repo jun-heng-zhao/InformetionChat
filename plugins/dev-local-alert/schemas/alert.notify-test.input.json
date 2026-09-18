@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:informetionchat:service:alert.notify-test:input:1.0.0",
+  "title": "alert.notify-test 输入",
+  "type": "object",
+  "required": ["category", "eventId", "title", "body"],
+  "additionalProperties": false,
+  "properties": {
+    "category": {
+      "enum": ["local-test-alert", "local-test-info"],
+      "description": "必须是在 manifest 中登记的类别；未知类别会被宿主拒绝"
+    },
+    "eventId": {
+      "type": "string",
+      "description": "来源事件 ID，与修订号共同构成去重键"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "修订号；同键更高修订才能覆盖既有状态"
+    },
+    "requestedLevel": {
+      "enum": ["passive", "normal", "important", "critical"],
+      "description": "请求等级；实际等级由宿主按策略与权限计算"
+    },
+    "title": { "type": "string", "description": "标题，最长 120 字符" },
+    "body": { "type": "string", "description": "正文，最长 2000 字符" },
+    "expiresInSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 300,
+      "description": "有效期秒数；紧急提醒上限 5 分钟"
+    }
+  }
+}

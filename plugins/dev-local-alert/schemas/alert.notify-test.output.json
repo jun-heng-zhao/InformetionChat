@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:informetionchat:service:alert.notify-test:output:1.0.0",
+  "title": "alert.notify-test 输出",
+  "type": "object",
+  "required": ["notificationId", "effectiveLevel", "state"],
+  "additionalProperties": false,
+  "properties": {
+    "notificationId": { "type": "string", "description": "宿主通知 ID" },
+    "effectiveLevel": {
+      "enum": ["passive", "normal", "important", "critical"],
+      "description": "宿主计算出的实际等级，可能低于请求等级"
+    },
+    "state": {
+      "type": "string",
+      "description": "展示状态：displayed / received / acknowledged / expired / withdrawn"
+    },
+    "reason": {
+      "type": "string",
+      "description": "发生降级或未展示时的原因"
+    }
+  }
+}

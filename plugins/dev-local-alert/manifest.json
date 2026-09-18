@@ -1,0 +1,65 @@
+{
+  "manifestVersion": "1.2",
+  "id": "dev.local-alert",
+  "version": "1.0.0",
+  "displayName": "本地测试提醒",
+  "description": "演示用紧急提醒来源：按登记类别发布本地模拟事件，由宿主决定实际展示等级。",
+  "publisher": "local.development",
+  "license": "MIT",
+  "apiVersion": "platform.v1",
+  "engines": {
+    "platform": ">=1.0.0 <2.0.0",
+    "uiBridge": "1.2"
+  },
+  "runtime": {
+    "ui": {
+      "entry": "ui/index.html",
+      "format": "sandbox-webview",
+      "csp": "default-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'"
+    }
+  },
+  "platforms": ["linux", "windows"],
+  "connectivity": "offline",
+  "activationEvents": ["onCommand:alert.test"],
+  "contributes": {
+    "commands": ["alert.test", "alert.withdraw"],
+    "views": ["alert.panel"]
+  },
+  "permissions": ["notification.publish", "notification.critical", "notification.read", "service.call", "audit.append"],
+  "hostCapabilities": {
+    "required": ["ui.webview", "notifications.foreground"],
+    "optional": []
+  },
+  "services": {
+    "provides": [
+      {
+        "id": "alert.notify-test",
+        "version": "1.0.0",
+        "inputSchema": "schemas/alert.notify-test.input.json",
+        "outputSchema": "schemas/alert.notify-test.output.json",
+        "effects": ["send"],
+        "agentCallable": false,
+        "requiresUI": false
+      }
+    ]
+  },
+  "notifications": {
+    "categories": [
+      {
+        "id": "local-test-alert",
+        "label": "本地测试紧急提醒",
+        "description": "用户在宿主界面为该来源开启后，可直接显示前台紧急弹窗。",
+        "defaultLevel": "important",
+        "requestedMaxLevel": "critical"
+      },
+      {
+        "id": "local-test-info",
+        "label": "本地测试普通提醒",
+        "description": "未开启紧急授权的类别，用于验证按策略降级。",
+        "defaultLevel": "passive",
+        "requestedMaxLevel": "normal"
+      }
+    ]
+  },
+  "dependencies": []
+}

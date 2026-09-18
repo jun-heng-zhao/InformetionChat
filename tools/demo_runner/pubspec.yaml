@@ -1,0 +1,15 @@
+# 演示器包：装配宿主、加载示例插件、跑完 M1 验收主线与负向用例
+name: demo_runner                      # 仅用于本地演示与验收，不发布
+description: InformetionChat M1 端到端演示器
+version: 0.1.0-dev.1
+publish_to: none
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+resolution: workspace                  # 加入根 pubspec.yaml 的 pub workspace
+
+dependencies:
+  host_core:
+    path: ../../packages/host_core     # 宿主核心，演示器只通过它的公开接口操作
+  path: ^1.9.0                         # 跨平台拼接演示目录与输出文件路径

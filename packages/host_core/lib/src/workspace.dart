@@ -40,6 +40,9 @@ class PluginInstallation {
   });
 
   PluginManifest get manifest => package.manifest;
+
+  /// 通知来源 ID：由宿主安装记录生成，不接受插件在正文里自报来源
+  String get sourceId => 'source-$id';
 }
 
 /// 权限授权记录：按调用方与用途授权，可设有效期并可被撤销

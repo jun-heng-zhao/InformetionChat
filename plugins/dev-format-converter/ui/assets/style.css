@@ -1,0 +1,10 @@
+/* 文件职责：插件页面共用样式；内联样式会被 CSP 拒绝，因此必须外置为独立文件 */
+body { font: 14px system-ui, sans-serif; margin: 24px; color: #1f2328; }
+h1 { font-size: 18px; margin: 0 0 8px; }
+p { color: #57606a; line-height: 1.6; }
+label { display: block; margin: 12px 0 4px; }
+select, button, textarea { width: 100%; box-sizing: border-box; padding: 8px; }
+textarea { min-height: 200px; font-family: ui-monospace, monospace; }
+button { margin-top: 12px; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.5; }
+#status { margin-top: 12px; white-space: pre-wrap; color: #57606a; }

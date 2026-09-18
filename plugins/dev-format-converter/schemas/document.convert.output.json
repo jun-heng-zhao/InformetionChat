@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:informetionchat:service:document.convert:output:1.0.0",
+  "title": "document.convert 输出",
+  "type": "object",
+  "required": ["result", "mediaType"],
+  "additionalProperties": false,
+  "properties": {
+    "result": {
+      "type": "string",
+      "description": "转换后的正文；宿主会把它保存成临时资源句柄后再交给调用方"
+    },
+    "mediaType": {
+      "type": "string",
+      "description": "结果 MIME 类型"
+    },
+    "messageCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "参与转换的消息条数"
+    }
+  }
+}

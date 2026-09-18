@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:informetionchat:service:archive.export:input:1.0.0",
+  "title": "archive.export 输入",
+  "type": "object",
+  "required": ["source", "targetFormat"],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "调用方已获授权的归档资源引用，形如 resource:<handle>"
+    },
+    "targetFormat": {
+      "const": "markdown",
+      "description": "目标格式，透传给 document.convert"
+    }
+  }
+}
