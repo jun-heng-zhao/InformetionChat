@@ -63,6 +63,14 @@
         "uiBridge": {
           "type": "string",
           "minLength": 1
+        },
+        "node": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensionApi": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -87,6 +95,23 @@
             },
             "csp": {
               "type": "string"
+            }
+          }
+        },
+        "extension": {
+          "type": "object",
+          "required": [
+            "entry",
+            "format"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "entry": {
+              "type": "string",
+              "pattern": "^extension/.+\\.js$"
+            },
+            "format": {
+              "const": "node-extension-host"
             }
           }
         },
@@ -131,6 +156,11 @@
         },
         {
           "required": [
+            "extension"
+          ]
+        },
+        {
+          "required": [
             "worker"
           ]
         }
@@ -141,9 +171,7 @@
       "items": {
         "enum": [
           "windows",
-          "linux",
-          "ios",
-          "android"
+          "linux"
         ]
       },
       "minItems": 1,
@@ -351,6 +379,30 @@
     }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "required": [
+              "extension"
+            ]
+          }
+        },
+        "required": [
+          "runtime"
+        ]
+      },
+      "then": {
+        "properties": {
+          "engines": {
+            "required": [
+              "node",
+              "extensionApi"
+            ]
+          }
+        }
+      }
+    },
     {
       "if": {
         "properties": {
@@ -574,7 +626,6 @@
         "inputSchema",
         "outputSchema",
         "effects",
-        "agentCallable",
         "requiresUI"
       ],
       "additionalProperties": false,
@@ -627,7 +678,8 @@
           "uniqueItems": true
         },
         "agentCallable": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "requiresUI": {
           "type": "boolean"

@@ -12,10 +12,10 @@
 | ServiceBinding | workspaceId、consumer、serviceId、contractVersion、providerInstallationId、providerDigest、resourceScope | 用户选择并锁定的实现；升级重新检查 |
 | ResourceHandle | id、workspaceId、sessionId、recipient、resourceVersion、scope、expiresAt | 短期、可撤销的资源引用；不可作为持久对象主键 |
 | LocalTask | id、workspaceId、sessionId、caller、providerInstallationId、state、progress、output、sideEffectStatus | output 符合服务结果 schema，其中资源引用受会话和有效期限制 |
-| AgentSession | id、workspaceId、grants、budget、expiresAt | 独立且可撤销的自动化会话 |
+| AgentSession | id、mode、profile、agentHome、workspaceId、modelRoute、grants、toolSet、budget、expiresAt | 交互/API 共用的独立可撤销会话；API home 不静默复用桌面数据 |
 | NotificationPolicy | workspaceId、installationId、sourceId、category、maxLevel、allowInterrupt | M1 来源/类别授权，仅宿主可信界面可提高等级 |
 | Notification | id、installationId、sourceId、eventId、revision、requestedLevel、effectiveLevel、occurredAt、expiresAt、state、reason | 宿主去重并保存展示/确认/撤回状态，正文受权限限制 |
-| Connection（后续） | id、providerInstallationId、configRef、capabilities | 用户配置的连接，拓扑由连接器决定 |
+| Connection（后续） | id、providerId、mode、configRef、capabilities | 用户配置的连接；桌面 provider 为插件安装，Android provider 为编译入包的内部模块；账号、服务器或去中心拓扑由提供者决定 |
 
 M1 私有存储至少保存插件数据版本和配额；升级快照包含同一安装的包摘要、数据版本、离线约束及内容校验，恢复后生成新运行会话。工作区完整备份的模型见下表及[数据规范](../本地数据与备份恢复.md)。
 
