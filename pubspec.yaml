@@ -1,0 +1,11 @@
+# 工作区根：用 Dart pub workspace 统一解析宿主核心、宿主外壳与开发工具的依赖
+name: informetionchat_workspace        # 工作区根包名，仅用于统一依赖解析，不发布
+publish_to: none                       # 本地项目，禁止误发布到 pub.dev
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'                # 与 Flutter 3.47 自带的 Dart SDK 保持兼容
+
+workspace:
+  - packages/host_core                 # 纯 Dart 宿主核心：加载器/权限/注册表/句柄/任务/通知
+  - apps/host_shell                    # Flutter 宿主外壳：工作台界面与 WebView 运行时
+  - tools/agent-cli                    # Agent 测试客户端：stdio JSON-RPC 适配器

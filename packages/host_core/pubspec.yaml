@@ -1,0 +1,18 @@
+# 宿主核心包：平台无关的本地权限代理与插件运行时契约实现
+name: host_core                        # 被 host_shell 与 agent-cli 以 path 依赖引用
+description: InformetionChat 本地宿主核心（加载器、权限、资源句柄、服务注册表、任务、通知）
+version: 0.1.0-dev.1
+publish_to: none
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+resolution: workspace                  # 加入根 pubspec.yaml 的 pub workspace
+
+dependencies:
+  collection: ^1.18.0                 # Iterable 扩展（firstOrNull 等）
+  crypto: ^3.0.6                       # 包摘要（每文件与整体 SHA-256）
+  path: ^1.9.0                         # 路径归一化与包内路径安全校验
+
+dev_dependencies:
+  test: ^1.25.0                        # 无头运行 M1 协议验收用例
