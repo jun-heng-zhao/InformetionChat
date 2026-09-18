@@ -1,0 +1,638 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:informetionchat:plugin-manifest:1.2",
+  "title": "InformetionChat Local Plugin Manifest v1.2 draft",
+  "type": "object",
+  "required": [
+    "manifestVersion",
+    "id",
+    "version",
+    "apiVersion",
+    "engines",
+    "runtime",
+    "platforms",
+    "connectivity",
+    "permissions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]{2,127}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "publisher": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]{2,63}$"
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "apiVersion": {
+      "type": "string",
+      "const": "platform.v1"
+    },
+    "engines": {
+      "type": "object",
+      "required": [
+        "platform"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "wit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uiBridge": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ui": {
+          "type": "object",
+          "required": [
+            "entry",
+            "format"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "entry": {
+              "type": "string",
+              "pattern": "^ui/.+\\.html$"
+            },
+            "format": {
+              "const": "sandbox-webview"
+            },
+            "csp": {
+              "type": "string"
+            }
+          }
+        },
+        "worker": {
+          "type": "object",
+          "required": [
+            "entry",
+            "format"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "entry": {
+              "type": "string",
+              "pattern": "^worker/.+\\.wasm$"
+            },
+            "format": {
+              "const": "wasm-component"
+            },
+            "memoryMiB": {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 2048
+            },
+            "timeoutMs": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 300000
+            },
+            "concurrency": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 256
+            }
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "ui"
+          ]
+        },
+        {
+          "required": [
+            "worker"
+          ]
+        }
+      ]
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "windows",
+          "linux",
+          "ios",
+          "android"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "connectivity": {
+      "type": "string",
+      "enum": [
+        "offline",
+        "network"
+      ]
+    },
+    "activationEvents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "contributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "views": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "menus": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "objectTabs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_.-]+(?:/[a-z][a-z0-9_.-]*)*$"
+      },
+      "uniqueItems": true
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowlistedDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "uniqueItems": true
+    },
+    "manifestVersion": {
+      "const": "1.2"
+    },
+    "hostCapabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "optional": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/providedService"
+          }
+        },
+        "consumes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumedService"
+          }
+        }
+      }
+    },
+    "events": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "publishes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "subscribes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "categories"
+      ],
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "description",
+              "defaultLevel",
+              "requestedMaxLevel"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "defaultLevel": {
+                "enum": [
+                  "passive",
+                  "normal",
+                  "important",
+                  "critical"
+                ]
+              },
+              "requestedMaxLevel": {
+                "enum": [
+                  "passive",
+                  "normal",
+                  "important",
+                  "critical"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "required": [
+              "ui"
+            ]
+          }
+        },
+        "required": [
+          "runtime"
+        ]
+      },
+      "then": {
+        "properties": {
+          "engines": {
+            "required": [
+              "uiBridge"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "required": [
+              "worker"
+            ]
+          }
+        },
+        "required": [
+          "runtime"
+        ]
+      },
+      "then": {
+        "properties": {
+          "engines": {
+            "required": [
+              "wit"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "connectivity": {
+            "const": "offline"
+          }
+        },
+        "required": [
+          "connectivity"
+        ]
+      },
+      "then": {
+        "properties": {
+          "permissions": {
+            "items": {
+              "not": {
+                "pattern": "^network(?:[./]|$)"
+              }
+            }
+          },
+          "network": {
+            "properties": {
+              "allowlistedDomains": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "notifications"
+        ]
+      },
+      "then": {
+        "properties": {
+          "permissions": {
+            "contains": {
+              "const": "notification.publish"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "notifications"
+        ],
+        "properties": {
+          "notifications": {
+            "properties": {
+              "categories": {
+                "contains": {
+                  "properties": {
+                    "requestedMaxLevel": {
+                      "const": "critical"
+                    }
+                  },
+                  "required": [
+                    "requestedMaxLevel"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "permissions": {
+            "contains": {
+              "const": "notification.critical"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "connectivity": {
+            "const": "offline"
+          }
+        },
+        "required": [
+          "connectivity"
+        ]
+      },
+      "then": {
+        "properties": {
+          "services": {
+            "properties": {
+              "provides": {
+                "items": {
+                  "properties": {
+                    "effects": {
+                      "not": {
+                        "contains": {
+                          "const": "network"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$"
+    },
+    "versionRange": {
+      "type": "string",
+      "minLength": 1,
+      "description": "SemVer range; the installer parses and resolves this against installed candidates."
+    },
+    "schemaFile": {
+      "type": "string",
+      "pattern": "^schemas/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\\.json$"
+    },
+    "dependency": {
+      "type": "object",
+      "required": [
+        "id",
+        "versionRange"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "versionRange": {
+          "$ref": "#/$defs/versionRange"
+        },
+        "optional": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "consumedService": {
+      "type": "object",
+      "required": [
+        "id",
+        "versionRange"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "versionRange": {
+          "$ref": "#/$defs/versionRange"
+        },
+        "optional": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "providedService": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "description",
+        "inputSchema",
+        "outputSchema",
+        "effects",
+        "agentCallable",
+        "requiresUI"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputSchema": {
+          "$ref": "#/$defs/schemaFile"
+        },
+        "outputSchema": {
+          "$ref": "#/$defs/schemaFile"
+        },
+        "inputTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "outputTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "read",
+              "write",
+              "network",
+              "send",
+              "delete",
+              "install"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "agentCallable": {
+          "type": "boolean"
+        },
+        "requiresUI": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

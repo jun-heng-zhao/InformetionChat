@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://platform.example/schemas/chat-export.v1.json",
+  "title": "Chat Export",
+  "type": "object",
+  "required": ["schemaVersion", "snapshotAt", "workspaceId", "messages", "attachments"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "chat-export.v1" },
+    "snapshotAt": { "type": "string", "format": "date-time" },
+    "workspaceId": { "type": "string" },
+    "channels": { "type": "array", "items": { "$ref": "#/$defs/channel" } },
+    "messages": { "type": "array", "items": { "$ref": "#/$defs/message" } },
+    "attachments": { "type": "array", "items": { "$ref": "#/$defs/attachment" } }
+  },
+  "$defs": {
+    "channel": {
+      "type": "object",
+      "required": ["id", "type", "visibility"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "visibility": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "object",
+      "required": ["id", "channelId", "authorId", "createdAt", "body", "revision"],
+      "properties": {
+        "id": { "type": "string" },
+        "channelId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "body": { "type": "string" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "withdrawn": { "type": "boolean" },
+        "attachmentIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "attachment": {
+      "type": "object",
+      "required": ["id", "mediaType", "size", "sha256"],
+      "properties": {
+        "id": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "size": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+        "filename": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

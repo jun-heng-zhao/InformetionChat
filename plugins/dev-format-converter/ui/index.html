@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>格式转换</title>
+  <style>
+    body { font: 14px system-ui, sans-serif; margin: 24px; color: #202124; }
+    label { display: block; margin: 12px 0 4px; }
+    select, button, textarea { width: 100%; box-sizing: border-box; padding: 8px; }
+    textarea { min-height: 180px; font-family: ui-monospace, monospace; }
+    button { margin-top: 12px; cursor: pointer; }
+    #status { margin-top: 12px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>聊天记录格式转换</h1>
+  <p>开发示例插件。数据读取、文件保存和审计都必须通过宿主 JSON-RPC。</p>
+  <label for="format">目标格式</label>
+  <select id="format">
+    <option value="markdown">Markdown</option>
+    <option value="csv">CSV</option>
+    <option value="html">HTML</option>
+  </select>
+  <button id="load">读取聊天导出</button>
+  <button id="convert">转换并保存</button>
+  <label for="preview">预览</label>
+  <textarea id="preview" readonly></textarea>
+  <div id="status" role="status"></div>
+  <script>
+    let exportData = null;
+    let requestId = 0;
+    const pending = new Map();
+
+    function rpc(method, params) {
+      const id = ++requestId;
+      window.parent.postMessage({ jsonrpc: '2.0', id, method, params }, '*');
+      return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
+    }
+
+    window.addEventListener('message', (event) => {
+      const message = event.data || {};
+      if (!message.id || !pending.has(message.id)) return;
+      const request = pending.get(message.id);
+      pending.delete(message.id);
+      if (message.error) request.reject(new Error(message.error.message));
+      else request.resolve(message.result);
+    });
+
+    function convert(records, format) {
+      if (format === 'csv') {
+        const rows = [['createdAt', 'author', 'body'], ...records.map(r => [r.createdAt, r.author, r.body])];
+        return rows.map(row => row.map(v => `"${String(v ?? '').replaceAll('"', '""')}"`).join(',')).join('\n');
+      }
+      if (format === 'html') {
+        return '<!doctype html><meta charset="utf-8"><article>' + records.map(r => `<p><b>${r.author}</b> ${r.createdAt}<br>${String(r.body).replaceAll('&', '&amp;').replaceAll('<', '&lt;')}</p>`).join('') + '</article>';
+      }
+      return records.map(r => `- **${r.author}** ${r.createdAt}\n  ${String(r.body).replaceAll('\n', '\n  ')}`).join('\n');
+    }
+
+    document.querySelector('#load').onclick = async () => {
+      try {
+        exportData = await rpc('host.command.execute', { commandId: 'chat.export.read', input: { format: 'json' } });
+        document.querySelector('#preview').value = JSON.stringify(exportData, null, 2);
+        document.querySelector('#status').textContent = '已读取聊天导出。';
+      } catch (error) { document.querySelector('#status').textContent = `读取失败：${error.message}`; }
+    };
+
+    document.querySelector('#convert').onclick = async () => {
+      if (!exportData || !Array.isArray(exportData.records)) {
+        document.querySelector('#status').textContent = '请先读取聊天导出。';
+        return;
+      }
+      const format = document.querySelector('#format').value;
+      const content = convert(exportData.records, format);
+      document.querySelector('#preview').value = content;
+      try {
+        await rpc('host.file.save', { suggestedName: `chat-export.${format}`, content });
+        await rpc('host.command.execute', { commandId: 'audit.append', input: { action: 'format-converter.convert', format } });
+        document.querySelector('#status').textContent = '已转换并保存。';
+      } catch (error) { document.querySelector('#status').textContent = `保存失败：${error.message}`; }
+    };
+  </script>
+</body>
+</html>
